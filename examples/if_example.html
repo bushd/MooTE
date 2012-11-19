@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>if example</title>
+		<script src="../mootools/mootools.js"></script>
+  		<script src="../mootools/mootools.more.js"></script>
+  		<script src="../moote/mt.mootools_template_engine.class.js"></script>
+	</head>
+	<body>
+		<section id="inserthere"></section>
+	</body>
+	<script>
+		var variable = {
+			first: false,
+			second: true
+		};
+
+		var template = 'What is with the if? {{if window.variable.first || window.variable.second }}The condition  is true.{{else}}Oh no, the condtiton is not satisfied!{{/if}} But I will be there anyway :)';
+
+		moote = new MooTE({
+			update: 'inserthere',
+			template: template
+		});
+
+		moote.parse();
+	</script>
+</html>
