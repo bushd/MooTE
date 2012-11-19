@@ -8,6 +8,7 @@ var MooTE = new Class({
 		templateURL: undefined,
 		helper: {},
 		substitude: {},
+		debugMode: false
 	},
 
 	initialize: function(options) {
@@ -32,7 +33,8 @@ var MooTE = new Class({
 		}
 				
 		// substitute
-		tmp = this.render();
+		tmp = '<div data-moote>' + this.render() + '</div>';
+
 
 		var template = Elements.from(tmp, false);
 		
@@ -50,7 +52,7 @@ var MooTE = new Class({
 			//document.id(options.append).adopt(template);
 		}
 
-		//console.log('[TEMPLATE][SUCCESS]');
+		this.log('template successfully parsed');
 
 		return true;
 		
@@ -68,16 +70,14 @@ var MooTE = new Class({
 				url: this.options.templateURL,
 				evalScripts: true,
 				onRequest: function() {
-					//console.log('[TEMPLATE][REQUEST] attempt to load template from '+options.templateURL);
+					this.log('Request: attempt to load template from ' + options.templateURL);
 				},
 				onSuccess: function(template) {
-					//console.log('[TEMPLATE][SUCCESS] template loaded from '+options.templateURL);
-					//console.log('[TEMPLATE][SUCCESS] '+template);
+					this.log('Request: template successfully loaded from ' + options.templateURL);
 					options.template = template;
 				},
 				onFailure: function(xhr) {
-					//console.log('[TEMPLATE][FAILURE] attempt to load template from '+options.templateURL);
-					console.log('[XHR:FAILURE] '+JSON.encode(xhr));
+					this.log('Request Failure: ' + JSON.encode(xhr));
 				}
 			}).send();
 		}
@@ -101,7 +101,9 @@ var MooTE = new Class({
 		}
 
 		var workOnTag = this.workOnTag.bind(this);
-		return string.replace(expression, workOnTag);
+		result = string.replace(expression, workOnTag);
+
+		return result;
 
 	},
 
@@ -119,6 +121,24 @@ var MooTE = new Class({
 		switch(tag) {
 			case 'if': 
 				returnValue = this.ifFunction(inner, arguments);
+				break;
+
+			case 'each':
+				if (arguments[0] == undefined) {
+					returnValue = '';
+				}
+				else {
+					self = this;
+
+					var arr = self.eachItem[arguments[0]] || self[arguments[0]] || self.options[arguments[0]] || window[arguments[0]];
+
+					var returnValue = '';
+					Array.each(arr, function(item, index) {
+						self.eachItem = item;
+						template = self.findTags(inner);
+						returnValue += self.replaceVariables(template, item);
+					});
+				}
 				break;
 
 			default:
@@ -144,10 +164,12 @@ var MooTE = new Class({
 		return returnValue;
 	},
 
-	replaceVariables: function(string) {
+	replaceVariables: function(string, object) {
 		var expression = /\\?\{{:([^{}]+)\}}/g; // /{{:(.*)}}/i;
 
-		return string.substitute(this.options.substitute, expression);
+		var sub = object || this.options.substitute;
+
+		return string.substitute(sub, expression);
 	},
 
 	execFunctions: function(string, object) {
@@ -177,4 +199,12 @@ var MooTE = new Class({
 		}
 		return returnValue;
 	},
+
+	log: function(msg) {
+		if (this.options.debugMode) {
+			console.log(msg);
+		}
+	},
+
+	eachItem: {},
 });

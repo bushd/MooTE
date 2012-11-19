@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>if example</title>
+		<script src="../mootools/mootools.js"></script>
+  		<script src="../mootools/mootools.more.js"></script>
+  		<script src="../moote/mt.mootools_template_engine.class.js"></script>
+	</head>
+	<body>
+		<section id="inserthere"></section>
+	</body>
+	<script>
+		var Languages = [
+			{
+				name: 'german',
+				countries: [
+					{
+						name: 'Germany'
+					},
+					{
+						name: 'Autria'
+					},
+					{
+						name: 'Swiss'
+					}
+				]
+			},
+			{
+				name: 'french',
+				countries: [
+					{
+						name: 'France'
+					},
+					{
+						name: 'Swiss'
+					}
+				]
+			},
+			{
+				name: 'english',
+				countries: [
+					{
+						name: 'England'
+					},
+					{
+						name: 'Australia'
+					},
+					{
+						name: 'USA'
+					}
+				]
+			}
+		];
+
+		var template = 'Want to test the each? {{each Languages}}{{:name}} is spoken in {{each countries}} {{:name}}{{/each}}.<br />{{/each}} This part ist after the each-clause.';
+
+		moote = new MooTE({
+			update: 'inserthere',
+			template: template
+		});
+
+		moote.parse();
+	</script>
+</html>
